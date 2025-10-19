@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moodle UI/UX Improvement Suggestions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        /* Authentication Styles */
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .auth-container h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .auth-form input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .auth-form input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .auth-form button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .auth-form button:hover {
+            background: #2980b9;
+        }
+        
+        .auth-switch {
+            margin-top: 20px;
+            color: #7f8c8d;
+        }
+        
+        .auth-switch a {
+            color: #3498db;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+        
+        .demo-credentials {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close-modal:hover {
+            color: #e74c3c;
+        }
+        
+        /* Alert System */
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .alert.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .logout-btn {
+            padding: 8px 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        /* Page Styles */
+        .page {
+            background: white;
+            width: 21cm;
+            min-height: 29.7cm;
+            margin: 20px auto;
+            padding: 2cm;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .page-number {
+            position: absolute;
+            bottom: 1cm;
+            right: 2cm;
+            font-size: 12px;
+            color: #777;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #4a86e8;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin: 25px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h3 {
+            color: #2c3e50;
+            margin: 20px 0 10px;
+        }
+        
+        .objective {
+            background: #e8f4fc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .tasks {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .tasks ul {
+            list-style-type: none;
+        }
+        
+        .tasks li {
+            margin-bottom: 10px;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .tasks li:before {
+            content: "•";
+            color: #3498db;
+            font-weight: bold;
+            position: absolute;
+            left: 10px;
+        }
+        
+        .friction-point {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .improvement {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #2ecc71;
+        }
+        
+        .wireframe-container {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .wireframe {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .wireframe-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #7e8c8d;
+        }
+        
+        .mockup {
+            height: 200px;
+            background: linear-gradient(45deg, #ddd, #eee);
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #777;
+            font-style: italic;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .mockup img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .before {
+            border-top: 4px solid #e74c3c;
+        }
+        
+        .after {
+            border-top: 4px solid #2ecc71;
+        }
+        
+        .explanation {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .priority {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .high {
+            background: #ffdddd;
+            color: #e74c3c;
+        }
+        
+        .medium {
+            background: #fff4dd;
+            color: #f39c12;
+        }
+        
+        .low {
+            background: #ddffdd;
+            color: #27ae60;
+        }
+        
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Image Styles */
+        .ui-image {
+            width: 100%;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .image-caption {
+            text-align: center;
+            font-style: italic;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            
+            .page {
+                box-shadow: none;
+                margin: 0;
+                padding: 2cm;
+                width: auto;
+                height: auto;
+            }
+            
+            .auth-container, .dashboard-header, .modal {
+                display: none !important;
+            }
+            
+            .dashboard {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Login to Continue</h2>
+            <div id="loginAlert" class="alert"></div>
+            <form class="auth-form" id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button type="submit" id="loginBtn">Login <i class="fas fa-sign-in-alt"></i></button>
+            </form>
+            <div class="auth-switch">
+                Don't have an account? <a id="showRegister">Register</a>
+            </div>
+            <div class="demo-credentials">
+                <p><strong>Demo Credentials:</strong><br>
+                demo@example.com / password123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Create an Account</h2>
+            <div id="registerAlert" class="alert"></div>
+            <form class="auth-form" id="registerForm">
+                <input type="text" id="registerName" placeholder="Full Name" required>
+                <input type="email" id="registerEmail" placeholder="Email" required>
+                <input type="password" id="registerPassword" placeholder="Password" required minlength="6">
+                <input type="password" id="registerConfirmPassword" placeholder="Confirm Password" required>
+                <button type="submit" id="registerBtn">Register <i class="fas fa-user-plus"></i></button>
+            </form>
+            <div class="auth-switch">
+                Already have an account? <a id="showLogin">Login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Container (shown when not logged in) -->
+    <div class="auth-container" id="authContainer">
+        <h2>Moodle UI/UX Improvement Suggestions</h2>
+        <p>Please login or register to view the full document</p>
+        <div class="demo-credentials">
+            <p><strong>Demo Credentials:</strong><br>
+            demo@example.com / password123</p>
+        </div>
+        <button id="openLogin" class="auth-btn">Login</button>
+        <div class="auth-switch">
+            Don't have an account? <a id="openRegister">Register</a>
+        </div>
+    </div>
+
+    <!-- Dashboard (shown when logged in) -->
+    <div class="dashboard" id="dashboard">
+        <div class="dashboard-header">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span id="userName">User</span>
+            </div>
+            <button class="logout-btn" id="logoutBtn">Logout <i class="fas fa-sign-out-alt"></i></button>
+        </div>
+
+        <!-- Page 1: Title Page -->
+        <div class="page">
+            <header>
+                <h1>Moodle UI/UX Improvement Suggestions</h1>
+                <p>Comprehensive Analysis and Proposed Solutions</p>
+            </header>
+            
+            <div class="objective">
+                <h2>Objective</h2>
+                <p>Analyze existing Moodle interface and propose improvements to enhance user experience, increase engagement, and improve learning outcomes.</p>
+            </div>
+            
+            <div class="tasks">
+                <h2>Tasks</h2>
+                <ul>
+                    <li>Identify 5–7 UI/UX friction points in the current Moodle interface</li>
+                    <li>Create wireframes of improved layout or feature enhancement</li>
+                    <li>Add detailed explanations for each suggestion</li>
+                    <li>Prioritize improvements based on impact and effort required</li>
+                    <li>Provide implementation recommendations</li>
+                </ul>
+            </div>
+            
+            <div class="footer">
+                <p>Prepared by: UX Design Team | Date: October 26, 2023</p>
+            </div>
+            
+            <div class="page-number">Page 1 of 8</div>
+        </div>
+
+        <!-- Page 2: Friction Point 1 -->
+        <div class="page">
+            <h2>Friction Point 1: Cluttered Dashboard</h2>
+            
+            <div class="friction-point">
+                <h3>Problem <span class="priority high">High Priority</span></h3>
+                <p>The current Moodle dashboard presents too much information at once, causing cognitive overload for users. Courses are displayed in a long list without proper organization or prioritization.</p>
+            </div>
+            
+            <img src="https://images.unsplash.com/photo-1611224923853-80b023f02d71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Cluttered Dashboard Example" class="ui-image">
+            <p class="image-caption">Current Moodle dashboard with cluttered interface and lack of visual hierarchy</p>
+            
+            <div class="wireframe-container">
+                <div class="wireframe">
+                    <div class="wireframe-title">Current Dashboard</div>
+                    <div class="mockup before">
+                        <img src="https://images.unsplash.com/photo-1581276879432-15e50529f34b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Current Dashboard">
+                    </div>
+                    <div class="explanation">
+                        <p>Excessive information, lack of visual hierarchy, no personalization options, and difficult to find important content quickly.</p>
+                    </div>
+                </div>
+                
+                <div class="wireframe">
+                    <div class="wireframe-title">Proposed Dashboard</div>
+                    <div class="mockup after">
+                        <img src="https://images.unsplash.com/photo-1593508512255-86ab42a8e620?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Proposed Dashboard">
+                    </div>
+                    <div class="explanation">
+                        <p>Simplified layout, personalized course recommendations, priority tasks highlighted, and intuitive navigation.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="improvement">
+                <h3>Proposed Solution</h3>
+                <p>Implement a customizable dashboard with widget-based architecture. Users can add, remove, and rearrange components based on their preferences and needs.</p>
+                <p><strong>Key improvements:</strong></p>
+                <ul>
+                    <li>Personalized course recommendations</li>
+                    <li>Priority task highlighting</li>
+                    <li>Visual progress indicators</li>
+                    <li>Collapsible sections</li>
+                    <li>Quick access to frequently used features</li>
+                </ul>
+            </div>
+            
+            <div class="page-number">Page 2 of 8</div>
+        </div>
+
+        <!-- Page 3: Friction Point 2 -->
+        <div class="page">
+            <h2>Friction Point 2: Inconsistent Navigation</h2>
+            
+            <div class="friction-point">
+                <h3>Problem <span class="priority high">High Priority</span></h3>
+                <p>Navigation elements change depending on where you are in Moodle, causing confusion and disorientation. Users often get lost and struggle to find their way back to previous pages.</p>
+            </div>
+            
+            <img src="OIP (1).webp" alt="Inconsistent Navigation Example" class="ui-image">
+            <p class="image-caption">Inconsistent navigation patterns in Moodle</p>
+            
+            <div class="wireframe-container">
+                <div class="wireframe">
+                    <div class="wireframe-title">Current Navigation</div>
+                    <div class="mockup before">
+                        <img src="https://images.unsplash.com/photo-1589652717521-10c0d092dea9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Current Navigation">
+                    </div>
+                    <div class="explanation">
+                        <p>Breadcrumbs are often missing or incomplete, menu structures change between courses, and back navigation is unpredictable.</p>
+                    </div>
+                </div>
+                
+                <div class="wireframe">
+                    <div class="wireframe-title">Proposed Navigation</div>
+                    <div class="mockup after">
+                        <img src="https://images.unsplash.com/photo-1601072385401-1d9d1330bf07?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Proposed Navigation">
+                    </div>
+                    <div class="explanation">
+                        <p>Standardized navigation across all sections, persistent menu bar, improved breadcrumbs, and better history tracking.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="improvement">
+                <h3>Proposed Solution</h3>
+                <p>Implement a consistent navigation system with these elements:</p>
+                <ul>
+                    <li>Persistent top navigation bar with standardized menu</li>
+                    <li>Comprehensive breadcrumb trail on all pages</li>
+                    <li>Quick access to recently visited pages</li>
+                    <li>Standardized back-to-dashboard button on all pages</li>
+                    <li>Course-specific navigation in a consistent location</li>
+                </ul>
+            </div>
+            
+            <div class="page-number">Page 3 of 8</div>
+        </div>
+
+        <!-- Page 4: Friction Point 3 -->
+        <div class="page">
+            <h2>Friction Point 3: Mobile Unfriendly Interface</h2>
+            
+            <div class="friction-point">
+                <h3>Problem <span class="priority high">High Priority</span></h3>
+                <p>The current Moodle interface does not provide a good experience on mobile devices. Elements are too small, navigation is difficult, and many features are hard to use on touch screens.</p>
+            </div>
+            
+            <img src="https://images.unsplash.com/photo-1601333143668-32adc0e376c7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Mobile Unfriendly Example" class="ui-image">
+            <p class="image-caption">Non-responsive design on mobile devices</p>
+            
+            <div class="wireframe-container">
+                <div class="wireframe">
+                    <div class="wireframe-title">Current Mobile Experience</div>
+                    <div class="mockup before">
+                        <img src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Current Mobile">
+                    </div>
+                    <div class="explanation">
+                        <p>Desktop interface shrunk to mobile size, requiring zooming and panning. Touch targets are too small, and forms are difficult to complete.</p>
+                    </div>
+                </div>
+                
+                <div class="wireframe">
+                    <div class="wireframe-title">Proposed Mobile Experience</div>
+                    <div class="mockup after">
+                        <img src="https://images.unsplash.com/photo-1601784551446-66c9e1e933ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Proposed Mobile">
+                    </div>
+                    <div class="explanation">
+                        <p>Mobile-first design, appropriately sized touch targets, simplified workflows, and mobile-optimized forms and interactions.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="improvement">
+                <h3>Proposed Solution</h3>
+                <p>Develop a fully responsive Moodle interface with mobile-specific enhancements:</p>
+                <ul>
+                    <li>Mobile-first responsive design</li>
+                    <li>Larger touch targets for finger interaction</li>
+                    <li>Simplified workflows for mobile users</li>
+                    <li>Mobile-optimized form inputs</li>
+                    <li>Offline capability for key functions</li>
+                    <li>Progressive Web App (PWA) functionality</li>
+                </ul>
+            </div>
+            
+            <div class="page-number">Page 4 of 8</div>
+        </div>
+
+        <!-- Page 5: Friction Point 4 -->
+        <div class="page">
+            <h2>Friction Point 4: Inadequate Notification System</h2>
+            
+            <div class="friction-point">
+                <h3>Problem <span class="priority medium">Medium Priority</span></h3>
+                <p>Users often miss important updates because the notification system is not effective. Notifications are buried in menus, lack prioritization, and cannot be customized effectively.</p>
+            </div>
+            
+            <img src="https://images.unsplash.com/photo-1611605698335-8b156e8e4c6a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Notification System Example" class="ui-image">
+            <p class="image-caption">Current notification system with hidden notifications</p>
+            
+            <div class="wireframe-container">
+                <div class="wireframe">
+                    <div class="wireframe-title">Current Notification System</div>
+                    <div class="mockup before">
+                        <img src="https://images.unsplash.com/photo-1611605698335-8b156e8e4c6a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Current Notifications">
+                    </div>
+                    <div class="explanation">
+                        <p>Notifications are hidden behind a menu, all notifications look the same regardless of importance, and users receive no alerts for critical updates.</p>
+                    </div>
+                </div>
+                
+                <div class="wireframe">
+                    <div class="wireframe-title">Proposed Notification System</div>
+                    <div class="mockup after">
+                        <img src="https://images.unsplash.com/photo-1579202673506-ca846ce49eeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Proposed Notifications">
+                    </div>
+                    <div class="explanation">
+                        <p>Visible notification indicator, categorized notifications, customizable alerts, and ability to set notification preferences per course.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="improvement">
+                <h3>Proposed Solution</h3>
+                <p>Redesign the notification system with these features:</p>
+                <ul>
+                    <li>Visible notification badge on the navigation bar</li>
+                    <li>Categorization of notifications by type and priority</li>
+                    <li>Customizable notification preferences per course</li>
+                    <li>Push notifications for urgent updates</li>
+                    <li>Email digests for less urgent notifications</li>
+                    <li>Ability to mark notifications as read/unread</li>
+                </ul>
+            </div>
+            
+            <div class="page-number">Page 5 of 8</div>
+        </div>
+
+        <!-- Page 6: Friction Point 5 -->
+        <div class="page">
+            <h2>Friction Point 5: Complex Assignment Submission</h2>
+            
+            <div class="friction-point">
+                <h3>Problem <span class="priority medium">Medium Priority</span></h3>
+                <p>The process of submitting assignments is confusing and involves too many steps. Students often struggle to find submission points, upload files correctly, and confirm their submissions.</p>
+            </div>
+            
+            <img src="https://images.unsplash.com/photo-1589279009755-29c5ca4c5d3a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Assignment Submission Example" class="ui-image">
+            <p class="image-caption">Complex assignment submission process</p>
+            
+            <div class="wireframe-container">
+                <div class="wireframe">
+                    <div class="wireframe-title">Current Submission Process</div>
+                    <div class="mockup before">
+                        <img src="https://images.unsplash.com/photo-1589279009755-29c5ca4c5d3a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Current Submission">
+                    </div>
+                    <div class="explanation">
+                        <p>Unclear submission status, confusing file upload process, lack of confirmation, and difficult to find submission history.</p>
+                    </div>
+                </div>
+                
+                <div class="wireframe">
+                    <div class="wireframe-title">Proposed Submission Process</div>
+                    <div class="mockup after">
+                        <img src="https://images.unsplash.com/photo-1616007736933-54d2525a2c19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Proposed Submission">
+                    </div>
+                    <div class="explanation">
+                        <p>One-page submission process, drag-and-drop file upload, clear submission status, and immediate confirmation with receipt.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="improvement">
+                <h3>Proposed Solution</h3>
+                <p>Simplify the assignment submission process with these improvements:</p>
+                <ul>
+                    <li>Single-page submission form with clear instructions</li>
+                    <li>Drag-and-drop file upload with preview capability</li>
+                    <li>Clear indicators of submission status and deadlines</li>
+                    <li>Immediate confirmation with submission receipt</li>
+                    <li>Easy access to submission history and feedback</li>
+                </ul>
+            </div>
+            
+            <div class="page-number">Page 6 of 8</div>
+        </div>
+
+        <!-- Page 7: Friction Point 6 -->
+        <div class="page">
+            <h2>Friction Point 6: Lack of Visual Engagement</h2>
+            
+            <div class="friction-point">
+                <h3>Problem <span class="priority low">Low Priority</span></h3>
+                <p>The current interface is visually unappealing and lacks modern design elements. This reduces user engagement and makes the platform feel outdated.</p>
+            </div>
+            
+            <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Visual Design Example" class="ui-image">
+            <p class="image-caption">Outdated visual design with poor aesthetics</p>
+            
+            <div class="wireframe-container">
+                <div class="wireframe">
+                    <div class="wireframe-title">Current Visual Design</div>
+                    <div class="mockup before">
+                        <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Current Design">
+                    </div>
+                    <div class="explanation">
+                        <p>Outdated color scheme, lack of visual hierarchy, poor typography, and minimal use of modern UI elements.</p>
+                    </div>
+                </div>
+                
+                <div class="wireframe">
+                    <div class="wireframe-title">Proposed Visual Design</div>
+                    <div class="mockup after">
+                        <img src="https://images.unsplash.com/photo-1561070791-36c11767b26a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Proposed Design">
+                    </div>
+                    <div class="explanation">
+                        <p>Modern color palette, improved typography, appropriate use of whitespace, consistent iconography, and engaging visual elements.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="improvement">
+                <h3>Proposed Solution</h3>
+                <p>Implement a visual refresh with these elements:</p>
+                <ul>
+                    <li>Modern color scheme with accessible contrast ratios</li>
+                    <li>Improved typography with better readability</li>
+                    <li>Consistent iconography throughout the interface</li>
+                    <li>Appropriate use of whitespace and visual hierarchy</li>
+                    <li>Customizable themes for different institutions</li>
+                    <li>Dark mode option</li>
+                </ul>
+            </div>
+            
+            <div class="page-number">Page 7 of 8</div>
+        </div>
+
+        <!-- Page 8: Implementation Plan -->
+        <div class="page">
+            <h2>Implementation Plan & Recommendations</h2>
+            
+            <div class="improvement">
+                <h3>Prioritization of Improvements</h3>
+                <p>Based on impact and effort analysis, we recommend the following implementation order:</p>
+                <ol>
+                    <li><strong>Mobile Responsive Design</strong> - Highest impact as mobile usage continues to grow</li>
+                    <li><strong>Dashboard Improvements</strong> - Direct impact on daily user experience</li>
+                    <li><strong>Navigation Consistency</strong> - Reduces user frustration and support requests</li>
+                    <li><strong>Notification System Upgrade</strong> - Improves communication effectiveness</li>
+                    <li><strong>Assignment Submission Simplification</strong> - Critical for student success</li>
+                    <li><strong>Visual Design Refresh</strong> - Important for perceived modernity and engagement</li>
+                </ol>
+            </div>
+            
+            <img src="https://images.unsplash.com/photo-1579389083078-4e7018379f7e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Implementation Plan" class="ui-image">
+            <p class="image-caption">Sample implementation timeline for Moodle improvements</p>
+            
+            <div class="improvement">
+                <h3>Implementation Approach</h3>
+                <p>We recommend an iterative approach to implementing these improvements:</p>
+                <ul>
+                    <li>Start with user research and testing to validate assumptions</li>
+                    <li>Develop a design system to ensure consistency</li>
+                    <li>Implement improvements in phases, starting with highest priority</li>
+                    <li>Conduct usability testing at each phase</li>
+                    <li>Provide options for institutions to customize features</li>
+                    <li>Maintain backward compatibility during transition</li>
+                </ul>
+            </div>
+            
+            <div class="improvement">
+                <h3>Expected Outcomes</h3>
+                <p>With these improvements, we expect to see:</p>
+                <ul>
+                    <li>Increased user engagement and satisfaction</li>
+                    <li>Reduced support requests related to navigation and usability</li>
+                    <li>Improved learning outcomes through better communication</li>
+                    <li>Higher adoption rates among mobile users</li>
+                    <li>More positive perception of the Moodle platform</li>
+                </ul>
+            </div>
+            
+            <div class="footer">
+                <p>For more detailed wireframes or implementation guidance, please contact the UX Design Team.</p>
+            </div>
+            
+            <div class="page-number">Page 8 of 8</div>
+        </div>
+    </div>
+
+    <script>
+        // In-memory database simulation
+        const users = JSON.parse(localStorage.getItem('users')) || [
+            { 
+                name: 'Demo User', 
+                email: 'demo@example.com', 
+                password: 'password123',
+                avatar: 'D'
+            }
+        ];
+        
+        // DOM Elements
+        const authContainer = document.getElementById('authContainer');
+        const dashboard = document.getElementById('dashboard');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginAlert = document.getElementById('loginAlert');
+        const registerAlert = document.getElementById('registerAlert');
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        // Show/hide modals
+        document.getElementById('openLogin').addEventListener('click', () => showModal(loginModal));
+        document.getElementById('openRegister').addEventListener('click', () => showModal(registerModal));
+        document.getElementById('showRegister').addEventListener('click', () => {
+            hideModal(loginModal);
+            showModal(registerModal);
+        });
+        document.getElementById('showLogin').addEventListener('click', () => {
+            hideModal(registerModal);
+            showModal(loginModal);
+        });
+        
+        // Close modals
+        document.querySelectorAll('.close-modal').forEach(closeBtn => {
+            closeBtn.addEventListener('click', () => {
+                hideModal(loginModal);
+                hideModal(registerModal);
+            });
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) hideModal(loginModal);
+            if (e.target === registerModal) hideModal(registerModal);
+        });
+        
+        // ESC key to close modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hideModal(loginModal);
+                hideModal(registerModal);
+            }
+        });
+        
+        // Login form submission
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Show loading state
+            const loginBtn = document.getElementById('loginBtn');
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<span class="loading"></span> Logging in...';
+            loginBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                const user = users.find(u => u.email === email && u.password === password);
+                
+                if (user) {
+                    showAlert(loginAlert, 'Login successful! Redirecting...', 'success');
+                    // Save user session
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    
+                    // Update UI
+                    setTimeout(() => {
+                        hideModal(loginModal);
+                        checkAuth();
+                    }, 1500);
+                } else {
+                    showAlert(loginAlert, 'Invalid email or password', 'error');
+                }
+                
+                // Reset button
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
+            }, 1000);
+        });
+        
+        // Register form submission
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showAlert(registerAlert, 'Passwords do not match', 'error');
+                return;
+            }
+            
+            // Check if user already exists
+            if (users.some(user => user.email === email)) {
+                showAlert(registerAlert, 'User with this email already exists', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const registerBtn = document.getElementById('registerBtn');
+            const originalText = registerBtn.innerHTML;
+            registerBtn.innerHTML = '<span class="loading"></span> Registering...';
+            registerBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                const newUser = {
+                    name,
+                    email,
+                    password,
+                    avatar: name.charAt(0).toUpperCase()
+                };
+                
+                users.push(newUser);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                showAlert(registerAlert, 'Registration successful! You can now login.', 'success');
+                
+                // Reset form
+                registerForm.reset();
+                
+                // Reset button
+                registerBtn.innerHTML = originalText;
+                registerBtn.disabled = false;
+                
+                // Switch to login after delay
+                setTimeout(() => {
+                    hideModal(registerModal);
+                    showModal(loginModal);
+                }, 1500);
+            }, 1000);
+        });
+        
+        // Logout functionality
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('currentUser');
+            checkAuth();
+        });
+        
+        // Helper functions
+        function showModal(modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function hideModal(modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            // Clear forms and alerts
+            loginForm.reset();
+            registerForm.reset();
+            loginAlert.classList.remove('show');
+            registerAlert.classList.remove('show');
+        }
+        
+        function showAlert(alertElement, message, type) {
+            alertElement.textContent = message;
+            alertElement.className = `alert alert-${type} show`;
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                alertElement.classList.remove('show');
+            }, 5000);
+        }
+        
+        function checkAuth() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (currentUser) {
+                authContainer.style.display = 'none';
+                dashboard.style.display = 'block';
+                
+                // Update user info
+                userName.textContent = currentUser.name;
+                userAvatar.textContent = currentUser.avatar;
+            } else {
+                authContainer.style.display = 'block';
+                dashboard.style.display = 'none';
+            }
+        }
+        
+        // Initialize
+        checkAuth();
+        
+        // Enter key to submit forms
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (loginModal.classList.contains('active')) {
+                    loginForm.dispatchEvent(new Event('submit'));
+                } else if (registerModal.classList.contains('active')) {
+                    registerForm.dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+    </script>
+</body>
+</html>
